@@ -10,86 +10,7 @@
 
 (function(root){
 
-  // shim layer with setTimeout fallback
-  // from Paul Irish
-  // root.requestAnimFrame = (function(){
-  // return  root.requestAnimationFrame       || 
-  //         root.webkitRequestAnimationFrame || 
-  //         root.mozRequestAnimationFrame    || 
-  //         root.oRequestAnimationFrame      || 
-  //         root.msRequestAnimationFrame     || 
-  //         function(/* function */ callback, /* DOMElement */ element){
-  //           root.setTimeout(callback, 1000 / 60);
-  //         };
-  // })();
-
-  // var Obj = 
-  // {
-  //   spawn: function(object){
-  //     var newObject = Object.create(this);
-  //     for (var prop in object) 
-  //     {
-  //       if (object.hasOwnProperty(prop)) 
-  //       {
-  //         newObject[prop] = object[prop];      
-  //       }
-  //     }
-  //     return newObject;
-  //   },
-  //   each: function(array, callback)
-  //   {
-  //     for(var i=0, len = array.length; i < len; i++)
-  //     {
-  //       callback(array[i], i);
-  //     }
-  //   }
-  // };
-
-  var Layer = {
-    //set: [],
-    needsRender: false,
-    init: function(stack)
-    {
-      stack.layers.push(this);
-      this.width = stack.width;
-      this.height = stack.height;
-      var canvas = document.createElement('canvas');
-      this.element = canvas;
-      this.ctx = canvas.getContext('2d');
-      canvas.width = stack.width;
-      canvas.height = stack.height;
-      stack.container.appendChild(canvas);
-      return this;
-    },
-    clear: function()
-    {
-      this.ctx.clearRect(0, 0, this.width, this.height);
-    },
-    render: function()
-    {
-      this.clear();
-     // console.log(this.name);
-      for(var i = 0; i < this.set.length; i++)
-      {
-        var obj = this.set[i];
-        //console.log(obj[0].width);
-        if(obj[0].position.x + obj[0].width/2 > 0 && obj[0].position.x - obj[0].width/2 < this.width
-                 && obj[0].position.y + obj[0].height/2 > 0
-                 && obj[0].position.y - obj[0].height/2 < this.height)
-                 {
-                    obj[0][obj[1]]();           
-                 }
-      }
-      this.needsRender = false;
-    },
-    addToLayer: function(obj, drawMethod)
-    {
-      this.set.push([obj, drawMethod]);
-      obj.layer = this;
-    }
-  }
-
-  var Stack = {
+  var Rothko = {
     layers: {},
     layerOrder: [],
     ctx,
@@ -203,14 +124,71 @@
         }
       }
     }
-  });
+  };
+
+  var Layer = {
+    //set: [],
+    needsRender: false,
+    init: function(stack)
+    {
+      stack.layers.push(this);
+      this.width = stack.width;
+      this.height = stack.height;
+      var canvas = document.createElement('canvas');
+      this.element = canvas;
+      this.ctx = canvas.getContext('2d');
+      canvas.width = stack.width;
+      canvas.height = stack.height;
+      stack.container.appendChild(canvas);
+      return this;
+    },
+    clear: function()
+    {
+      this.ctx.clearRect(0, 0, this.width, this.height);
+    },
+    render: function()
+    {
+      this.clear();
+     // console.log(this.name);
+      for(var i = 0; i < this.set.length; i++)
+      {
+        var obj = this.set[i];
+        //console.log(obj[0].width);
+        if(obj[0].position.x + obj[0].width/2 > 0 && obj[0].position.x - obj[0].width/2 < this.width
+                 && obj[0].position.y + obj[0].height/2 > 0
+                 && obj[0].position.y - obj[0].height/2 < this.height)
+                 {
+                    obj[0][obj[1]]();           
+                 }
+      }
+      this.needsRender = false;
+    },
+    addToLayer: function(obj, drawMethod)
+    {
+      this.set.push([obj, drawMethod]);
+      obj.layer = this;
+    }
+  }
+
+  var Drawable = Obj.spawn(
+  {
+    draw: function()
+    {
+      this.ctx.save();
+      this.ctx.scale(this.world.scale, this.world.scale);
+      this.ctx.translate(this.position.x+ this.world.o.x, this.position.y + this.world.o.y);
+      this.innerDraw();
+      this.ctx.restore();
+    }
+  })
+  
 
   if(typeof module !== 'undefined' && module.exports)
   {
-    module.exports = HexGame;
+    module.exports = Rothko;
   } else{
-    root['HexGame'] = HexGame;
-    root['Layer'] = Layer;
+    root['Rothko'] = Rothko;
+    root['Rothko']['Layer'] = Layer;
   };
 
 }(this))
