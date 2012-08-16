@@ -10,13 +10,29 @@
 
 (function(root){
 
-  var Rothko = {
-    layers: {},
+/*
+  var canvas = document.getElementById("game");
+
+  var world = Rothko.create(
+  {
+    element: canvas,
+    container: document.getElementById("gameContainer"),
+    ctx: canvas.getContext('2d'),
+    width: canvas.width,
+    height: canvas.height,
     layerOrder: [],
-    ctx,
-    element,
-    tileset,
-    lastUpdate,
+    layers: [],
+    scale: 1
+  });
+*/
+
+  var Rothko = {
+    // layers: {},
+    // layerOrder: [],
+    // ctx,
+    // element,
+    // tileset,
+    // lastUpdate,
     addToLayer: function(layer, obj, drawMethod)
     {
       if(this.layers[layer])
@@ -57,13 +73,13 @@
           return null;
         }
     },
-    gameLoop: function(time)
+    runLoop: function(time)
     {
       var deltaTime = time - this.lastUpdate;
      // this.update(deltaTime);
       this.render(deltaTime);
       this.lastUpdate = time;
-      requestAnimFrame(this.gameLoop, this.ctx);
+      requestAnimFrame(this.runLoop, this.ctx);
     },
     origin:
     {
@@ -149,16 +165,19 @@
     render: function()
     {
       this.clear();
-     // console.log(this.name);
+      
       for(var i = 0; i < this.set.length; i++)
       {
-        var obj = this.set[i];
-        //console.log(obj[0].width);
-        if(obj[0].position.x + obj[0].width/2 > 0 && obj[0].position.x - obj[0].width/2 < this.width
-                 && obj[0].position.y + obj[0].height/2 > 0
-                 && obj[0].position.y - obj[0].height/2 < this.height)
+        var el = this.set[i],
+            obj = el[0],
+            drawMethod = el[1]
+      
+        if(    obj.position.x + obj.width/2 > 0 
+            && obj.position.x - obj.width/2 < this.width
+            && obj.position.y + obj.height/2 > 0
+            && obj.position.y - obj.height/2 < this.height)
                  {
-                    obj[0][obj[1]]();           
+                    obj[drawMethod]();           
                  }
       }
       this.needsRender = false;
@@ -170,8 +189,7 @@
     }
   }
 
-  var Drawable = Obj.spawn(
-  {
+  var Drawable = {
     draw: function()
     {
       this.ctx.save();
@@ -180,7 +198,7 @@
       this.innerDraw();
       this.ctx.restore();
     }
-  })
+  }
   
 
   if(typeof module !== 'undefined' && module.exports)
