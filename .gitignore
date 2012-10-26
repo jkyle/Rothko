@@ -1,2 +1,3 @@
-components
-.node_modules
+server.js
+components/
+.node_modules/
